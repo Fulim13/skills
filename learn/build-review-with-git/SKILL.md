@@ -7,7 +7,7 @@ disable-model-invocation: true
 ### Naming
 
 1. **Lesson_Title** - use the user's provided lesson title or derive one from the diff
-2. **Chapter_Number** - use the user's provided chapter number or Continue from the highes number already in `./instructions/`
+2. **Chapter_Number** - use the user's provided chapter number or Continue from the highes number already in `./instructions/`, EG Chapter 1 = 1.0, Chapter 1.4 = 1.4
 3. - **Lesson_Slug** — lowercase title, words joined by `-`.
 
 # Steps
