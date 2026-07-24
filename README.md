@@ -1,3 +1,3 @@
 ```sh
-npx skills@latest add mattpocock/skills
+npx skills@latest add Fulim13/skills
 ```
