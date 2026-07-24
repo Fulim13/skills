@@ -16,6 +16,7 @@ disable-model-invocation: true
 2. READ the diff (`git diff` and `git diff --staged`), then read the files it
    touches and their direct dependencies.
 3. Write the instructions based on [Instruction Guidelines](./Instruction_Guidelines.md).
+   - [Example](./Example_Instruction.md)
 4. Show to the user and revise until approved.
 5. **Theory questions (optional).** If the diff includes theory questions:
    1. Keep them in the code as comments:
