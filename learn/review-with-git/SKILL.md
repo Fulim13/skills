@@ -4,10 +4,6 @@ description: 'Grade the practice branch against the reference solution on main'
 disable-model-invocation: true
 ---
 
-Counterpart to [build-review-with-git](../build-review-with-git/SKILL.md). That skill
-hides a solution and leaves a practice branch; this one grades the attempt on that
-branch against the solution that stayed on `main`.
-
 The verdict is about **functionality**, not text. Different names, different helper
 split, different loop shape — all fine if the behaviour matches what the instructions
 asked for. Only behaviour differences fail.
@@ -97,7 +93,7 @@ Two rules on the report:
 - **Lead with the hint, not the answer.** For each Blocker, point at the file and line
   and name the shortfall, then give one nudge. The whole point of the practice branch
   is recall, and pasting `git show <sha>` spends it. Offer the reference at the end —
-  *"Say `show solution` for the reference diff"* — and only paste it when asked, or
+  _"Say `show solution` for the reference diff"_ — and only paste it when asked, or
   when the same Blocker survives a second review.
 - **Say `Done` out loud.** List the steps that passed. A review that only enumerates
   faults is hard to learn from.
