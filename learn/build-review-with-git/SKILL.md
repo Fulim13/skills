@@ -17,8 +17,10 @@ disable-model-invocation: true
    touches and their direct dependencies.
 3. Write the instructions based on [Instruction Guidelines](./Instruction_Guidelines.md).
    - [Example](./Example_Instruction.md)
-4. Show to the user and revise until approved.
-5. **Theory questions (optional).** If the diff includes theory questions:
+4. Reference the provided resource (Optional)
+   - If the user pass the resource: @file_name, then read the resource, else this step can be skipped
+5. Show to the user and revise until approved.
+6. **Theory questions (optional).** If the diff includes theory questions:
    1. Keep them in the code as comments:
       ```
       // Question: What is ...?
@@ -33,7 +35,7 @@ disable-model-invocation: true
       Answer: <answer>
       ```
 
-6. Save to `instructions/<Chapter_Number>_<Lesson_Slug>.md`. 7. Commit on the current branch:
+7. Save to `instructions/<Chapter_Number>_<Lesson_Slug>.md`. 7. Commit on the current branch:
 
 ```sh
 git add .
