@@ -110,7 +110,7 @@ python3 <skill-dir>/scripts/extract_frames.py \
   "video/<SLUG>.mp4" \
   --title "<SLUG>" \
   --interval 1 \
-  --threshold 60 \
+  --threshold 50 \
   --output "frames"
 ```
 
