@@ -189,12 +189,6 @@ def write_manifest(
     return manifest
 
 
-def clear_output_directory(output_dir: Path) -> None:
-    """Remove an existing output directory."""
-    if output_dir.exists():
-        shutil.rmtree(output_dir)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
@@ -218,10 +212,10 @@ def main() -> None:
     parser.add_argument(
         "--threshold",
         type=int,
-        default=5,
+        default=50,
         help=(
-            "Duplicate similarity threshold; default: 5. "
-            "Lower values remove fewer frames."
+            "Duplicate similarity threshold, 0-256 (phash at "
+            "hash_size 16); default: 50. Lower values remove fewer frames."
         ),
     )
 
@@ -246,12 +240,6 @@ def main() -> None:
             "Downscale frames wider than this; default: 1280. "
             "Use 0 to keep the original resolution."
         ),
-    )
-
-    parser.add_argument(
-        "--keep-existing",
-        action="store_true",
-        help="Do not clear the existing output directory",
     )
 
     args = parser.parse_args()
@@ -282,9 +270,6 @@ def main() -> None:
     temporary_dir = output_dir.parent / (
         f".{output_dir.name}_temporary"
     )
-
-    if not args.keep_existing:
-        clear_output_directory(output_dir)
 
     if temporary_dir.exists():
         shutil.rmtree(temporary_dir)

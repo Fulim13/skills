@@ -14,7 +14,7 @@
 - 修改配置不等于修改程序逻辑，降低误改代码的风险；
 - 配置和代码可以分开交付，避免把环境差异硬编码进程序。
 
-![配置文件便于查询和修改](../assets/171-viper-config/171-viper-config_00-00-21.jpg)
+![配置文件便于查询和修改](./assets/171-viper-config/171-viper-config_00-00-21.jpg)
 
 但“配置与代码分离”并不自动等于安全。密码、令牌等敏感值仍不能提交到 Git；生产环境应使用环境变量、密钥管理系统或受控配置中心，并限制配置文件权限。
 
@@ -58,7 +58,7 @@ blog:
   log: blog.db.log
 ```
 
-![嵌套的 mysql.yaml](../assets/171-viper-config/171-viper-config_00-00-00.jpg)
+![嵌套的 mysql.yaml](./assets/171-viper-config/171-viper-config_00-00-00.jpg)
 
 这里的密码只是课堂示例。实际仓库应使用占位符，例如 `${MYSQL_PASSWORD}`，真实值由部署环境注入。
 
@@ -73,7 +73,7 @@ file: log/blog.log
 
 冒号后必须有空白，通常写一个空格。YAML 通过缩进表达层级，而且缩进只能使用一致的空格；实际项目不要用 Tab，以免不同解析器或编辑器产生歧义。
 
-![冒号后的空白符](../assets/171-viper-config/171-viper-config_00-02-00.jpg)
+![冒号后的空白符](./assets/171-viper-config/171-viper-config_00-02-00.jpg)
 
 嵌套键 `blog.port` 的含义是：先进入 `blog` 对象，再读取它的 `port` 字段。Viper 默认使用点号访问这种层级。
 
@@ -130,7 +130,7 @@ func InitViper(dir, file, FileType string) *viper.Viper {
 }
 ```
 
-![InitViper 的三个定位参数](../assets/171-viper-config/171-viper-config_00-01-42.jpg)
+![InitViper 的三个定位参数](./assets/171-viper-config/171-viper-config_00-01-42.jpg)
 
 ### 三个定位步骤
 
@@ -171,7 +171,7 @@ if err := config.ReadInConfig(); err != nil {
 }
 ```
 
-![ReadInConfig 读取并解析配置](../assets/171-viper-config/171-viper-config_00-03-57.jpg)
+![ReadInConfig 读取并解析配置](./assets/171-viper-config/171-viper-config_00-03-57.jpg)
 
 常见失败原因包括：
 
@@ -209,7 +209,7 @@ enabled := dbViper.GetBool("feature.enabled")
 timeout := dbViper.GetDuration("server.timeout")
 ```
 
-![通过点号读取嵌套键](../assets/171-viper-config/171-viper-config_00-05-25.jpg)
+![通过点号读取嵌套键](./assets/171-viper-config/171-viper-config_00-05-25.jpg)
 
 这种方式适合：
 
@@ -238,7 +238,7 @@ if dbViper.IsSet("blog.age") {
 }
 ```
 
-![IsSet 保护可选配置读取](../assets/171-viper-config/171-viper-config_00-06-17.jpg)
+![IsSet 保护可选配置读取](./assets/171-viper-config/171-viper-config_00-06-17.jpg)
 
 配置项可以分为两类：
 
@@ -274,7 +274,7 @@ if err := logViper.Unmarshal(&config); err != nil {
 }
 ```
 
-![结构体、mapstructure 标签与 Unmarshal](../assets/171-viper-config/171-viper-config_00-07-07.jpg)
+![结构体、mapstructure 标签与 Unmarshal](./assets/171-viper-config/171-viper-config_00-07-07.jpg)
 
 `mapstructure` 标签声明“配置键 → Go 字段”的映射：
 
@@ -353,7 +353,7 @@ log/blog.log
 --- PASS: TestViper (0.00s)
 ```
 
-![两种读取方式的测试结果](../assets/171-viper-config/171-viper-config_00-07-44.jpg)
+![两种读取方式的测试结果](./assets/171-viper-config/171-viper-config_00-07-44.jpg)
 
 ## 11. `WatchConfig`：配置热更新
 
@@ -366,7 +366,7 @@ dbViper.WatchConfig()
 
 调用顺序很重要：先用 `AddConfigPath`、`SetConfigName`、`SetConfigType` 完成定位并读取，再启动监听。
 
-![先定位配置，再调用 WatchConfig](../assets/171-viper-config/171-viper-config_00-09-20.jpg)
+![先定位配置，再调用 WatchConfig](./assets/171-viper-config/171-viper-config_00-09-20.jpg)
 
 课程用 `Sleep` 留出人工修改时间：
 
@@ -387,7 +387,7 @@ port 3307
 port 3306
 ```
 
-![WatchConfig 读取修改后的端口](../assets/171-viper-config/171-viper-config_00-09-53.jpg)
+![WatchConfig 读取修改后的端口](./assets/171-viper-config/171-viper-config_00-09-53.jpg)
 
 ## 12. 热更新的工程边界
 

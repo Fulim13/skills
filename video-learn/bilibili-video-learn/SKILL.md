@@ -16,12 +16,17 @@ Everything is produced inside the **current working directory**:
 ```
 ./
 ├── video/          # mp4 + srt (step 2)
-├── assets/<slug>   # deduplicated frames + frames.tsv (step 4)
 ├── resources/      # OPTIONAL, user-supplied code snippets and slides
-└── notes/          # teaching note (step 6)
+└── notes/
+    ├── assets/<slug>/          # deduplicated frames + frames.tsv (step 4)
+    └── <SLUG>-teaching-note.md # teaching note (step 6)
 ```
 
-`SLUG` below means a short kebab-case name for the video, e.g. `168-zap-logger`. Pick it once in step 1 and reuse it everywhere.
+`SLUG` below means a short name for the video, formed as
+`<episode-number>-<topic-in-english>`, e.g. `168-zap-logger`. It becomes a
+filename, so use only `a`–`z`, `0`–`9` and hyphens — no spaces, no Chinese
+characters, no uppercase. Pick it once in step 1 and reuse it everywhere;
+`<SLUG>` and `<slug>` in this document mean the same string.
 
 ## Step 1 — Preflight
 
@@ -46,7 +51,9 @@ the _Get cookies.txt LOCALLY_ Chrome extension, open bilibili.com while logged
 in, and export `cookies.txt` to their Downloads folder. Without fresh cookies
 the high-quality formats and AI subtitles are not available.
 
-Ask the user for the video URL if it was not given, and agree on the `SLUG`.
+Ask the user for the video URL if it was not given. Then propose a `SLUG`
+derived from the video title using the rule above, and confirm it with the
+user before downloading anything.
 
 ## Step 2 — Download into `video/`
 
@@ -54,44 +61,34 @@ Download from inside `video/` so the mp4 and the srt both land there:
 
 ```sh
 mkdir -p video && cd video
-
-yt-dlp \
-  --cookies /mnt/c/Users/fulim/Downloads/cookies.txt \
-  -f "30064+30280" \
-  --write-subs \
-  --sub-langs ai-zh \
-  --sub-format srt \
-  --merge-output-format mp4 \
-  "<bilibili-url>"
+bash "<skill-dir>/scripts/download_video.sh" "<bilibili-url>" "<SLUG>"
 ```
 
-### yt-dlp flags
+### What `download_video.sh` runs
 
-| Flag                        | What it does                                                                     |
-| --------------------------- | -------------------------------------------------------------------------------- |
-| `--cookies <file>`          | Netscape-format cookie jar; required for logged-in quality and AI subtitles      |
-| `-f "30064+30280"`          | Explicit format ids: `30064` = 720p video, `30280` = 192k audio, merged together |
-| `--write-subs`              | Write the subtitle track to a file next to the video                             |
-| `--sub-langs ai-zh`         | Bilibili's AI-generated Chinese subtitles                                        |
-| `--sub-format srt`          | Preferred subtitle format                                                        |
-| `--merge-output-format mp4` | Remux the separate video and audio streams into one mp4                          |
+| Flag                        | What it does                                                                                                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--cookies <file>`          | Netscape-format cookie jar; required for logged-in quality and AI subtitles                                                                                         |
+| `-f "<video>+<audio>"`      | Explicit format ids, tried in this order until one succeeds: `30080` (1080p), `30064` (720p), `30032` (480p), `30016` (360p), each paired with `30280` (192k audio) |
+| `--write-subs`              | Write the subtitle track to a file next to the video                                                                                                                |
+| `--sub-langs ai-zh`         | Bilibili's AI-generated Chinese subtitles                                                                                                                           |
+| `--sub-format srt`          | Preferred subtitle format                                                                                                                                           |
+| `--merge-output-format mp4` | Remux the separate video and audio streams into one mp4                                                                                                             |
 
 Reference flags for when a download misbehaves (not part of the standard run):
 `-F` lists the format ids available for that video, `--list-subs` lists its
 subtitle tracks, `--skip-download` fetches subtitles only.
 
-### Rename
+### Verify
 
-yt-dlp names files after the Bilibili title, e.g.
-`168 - zap logger [1597967].mp4`. Rename both to the `SLUG` before continuing:
+The second argument names the files, so no renaming is needed:
 
 ```sh
-mv "<downloaded-name>.mp4" "<SLUG>.mp4"
-mv "<downloaded-name>.ai-zh.srt" "<SLUG>.ai-zh.srt"
+ls -l
 cd ..
 ```
 
-Verify with `ls video/` — you should have exactly `<SLUG>.mp4` and
+You should have exactly `<SLUG>.mp4` and
 `<SLUG>.ai-zh.srt`. If the srt is missing, the cookies were stale; refresh
 them and rerun with `--skip-download` added.
 
@@ -101,57 +98,56 @@ Explore the current directory. If a `resources/` folder exists, read **every**
 file in it — these are the code snippets and slides that accompany the video,
 and they are more authoritative than anything read off a video frame.
 
-## Step 4 — Extract frames into `assets/<slug>`
+## Step 4 — Extract frames into `notes/assets/<slug>`
 
 The script lives in this skill's `scripts/` folder:
 
 ```sh
+mkdir -p notes
 python3 <skill-dir>/scripts/extract_frames.py \
   "video/<SLUG>.mp4" \
   --title "<SLUG>" \
   --interval 1 \
   --threshold 50 \
-  --output "assets/<slug>"
+  --output "notes/assets/<slug>"
 ```
 
-Output: `assets/<slug>/<SLUG>_HH-MM-SS.jpg` plus `assets/<slug>/frames.tsv`, a
+Output: `notes/assets/<slug>/<SLUG>_HH-MM-SS.jpg` plus
+`notes/assets/<slug>/frames.tsv`, a
 `filename → timestamp → seconds` index used to line frames up with the SRT.
 
 ### extract_frames.py flags
 
-| Flag                   | Default        | What it does                                                                                                                                               |
-| ---------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `video` (positional)   | —              | Path to the input mp4                                                                                                                                      |
-| `--interval <seconds>` | `10`           | Seconds between sampled frames. Lower for fast-moving slides, higher for talking-head videos                                                               |
-| `--threshold <int>`    | `5`            | Perceptual-hash distance below which a frame counts as a duplicate of the last kept frame. **Higher removes more**; `0` keeps everything but exact repeats |
-| `--title <text>`       | video filename | Prefix used in frame filenames                                                                                                                             |
-| `--output <dir>`       | `frames`       | Output directory                                                                                                                                           |
-| `--max-width <px>`     | `1280`         | Downscale wider frames to cut vision-model cost; `0` keeps the original resolution                                                                         |
-| `--keep-existing`      | off            | Append to the output directory instead of clearing it first                                                                                                |
+| Flag                   | Default        | What it does                                                                                                                                                           |
+| ---------------------- | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `video` (positional)   | —              | Path to the input mp4                                                                                                                                                  |
+| `--interval <seconds>` | `10`           | Seconds between sampled frames. Lower for fast-moving slides, higher for talking-head videos                                                                           |
+| `--threshold <int>`    | `50`           | Perceptual-hash distance (`0`–`256`) below which a frame counts as a duplicate of the last kept frame. **Higher removes more**; `0` keeps everything but exact repeats |
+| `--title <text>`       | video filename | Prefix used in frame filenames                                                                                                                                         |
+| `--output <dir>`       | `frames`       | Output directory                                                                                                                                                       |
+| `--max-width <px>`     | `1280`         | Downscale wider frames to cut vision-model cost; `0` keeps the original resolution                                                                                     |
 
-Tuning: if slides are being dropped, lower `--threshold` (try `2`) or shorten
-`--interval`. If you get hundreds of near-identical frames, raise
-`--threshold` to `6`–`8`.
+Tuning: if slides are being dropped, lower `--threshold` (try `30`–`40`) or
+shorten `--interval`. If you get hundreds of near-identical frames, raise
+`--threshold` to `60`–`70`.
 
 ## Step 5 — Read everything
 
-1. Read `assets/<slug>/frames.tsv` first to get the timeline.
-2. Read **every** frame image in `assets/<slug>/` — none may be skipped. Work in
-   timestamp order and in batches so the ordering stays intact. (Must use a GPT Vision model to read and anlayze the image)
+1. Read `notes/assets/<slug>/frames.tsv` first to get the timeline.
+2. Read **every** frame image in `notes/assets/<slug>/` — none may be skipped. Work in
+   timestamp order and in batches so the ordering stays intact. (Must read and analyze the image)
 3. Read `video/<SLUG>.ai-zh.srt` in full.
 4. Cross-check both against `resources/` where it exists.
 
 Frame timestamps and SRT timestamps share the same clock, so use them to
 attach each transcript passage to the slide that was on screen.
 
-## Step 6 — Write the notes
+## Step 6 — Write the teaching notes
 
-Write two files:
+Write one files: **`notes/<SLUG>-teaching-note.md`**
 
-**`notes/<SLUG>-teaching-note.md`**
-
-- Refer [Example Teaching Notes](./references/Example_Teaching_Note.md)
-- Use the assets/<slug>/\*.jpg as much as possible (but the repeat jpg, don't use too many to confuse user) in the newly created teaching-note.md
+- Follow [Example Teaching Notes](./references/Example_Teaching_Note.md) for the outline and note constructions, the content is just the example
+- Embed a frame (from `./assets/<slug>/*.jpg`) in the newly created teaching-note.md as much as possible — a slide, a code screen, a terminal result. For Duplicated frame, don't put it. Link them as `./assets/<slug>/<file>.jpg`, relative to the note itself.
 
 ## Step 7 - Clean up all the unused image
 
