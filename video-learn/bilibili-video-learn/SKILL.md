@@ -1,13 +1,13 @@
 ---
 name: bilibili-video-learn
-description: 'Turn Bilibili Chinese video frames and subtitles into a full teaching english note and an active recall english note'
+description: 'Turn Bilibili video frames and subtitles into a full teaching note'
 disable-model-invocation: true
 ---
 
 # Bilibili Video Learn
 
 Download a Bilibili video with its AI subtitles, extract deduplicated frames,
-then read both to write a teaching note and an active recall note.
+then read both to write a teaching note.
 
 ## Workspace layout
 
@@ -16,13 +16,12 @@ Everything is produced inside the **current working directory**:
 ```
 ./
 ├── video/          # mp4 + srt (step 2)
-├── frames/         # deduplicated frames + frames.tsv (step 4)
+├── assets/<slug>   # deduplicated frames + frames.tsv (step 4)
 ├── resources/      # OPTIONAL, user-supplied code snippets and slides
-└── notes/          # teaching note + active recall note (step 6)
+└── notes/          # teaching note (step 6)
 ```
 
-`SLUG` below means a short kebab-case name for the video, e.g.
-`168-zap-logger`. Pick it once in step 1 and reuse it everywhere.
+`SLUG` below means a short kebab-case name for the video, e.g. `168-zap-logger`. Pick it once in step 1 and reuse it everywhere.
 
 ## Step 1 — Preflight
 
@@ -102,7 +101,7 @@ Explore the current directory. If a `resources/` folder exists, read **every**
 file in it — these are the code snippets and slides that accompany the video,
 and they are more authoritative than anything read off a video frame.
 
-## Step 4 — Extract frames into `frames/`
+## Step 4 — Extract frames into `assets/<slug>`
 
 The script lives in this skill's `scripts/` folder:
 
@@ -111,11 +110,11 @@ python3 <skill-dir>/scripts/extract_frames.py \
   "video/<SLUG>.mp4" \
   --title "<SLUG>" \
   --interval 1 \
-  --threshold 60 \
-  --output "frames"
+  --threshold 50 \
+  --output "assets/<slug>"
 ```
 
-Output: `frames/<SLUG>_HH-MM-SS.jpg` plus `frames/frames.tsv`, a
+Output: `assets/<slug>/<SLUG>_HH-MM-SS.jpg` plus `assets/<slug>/frames.tsv`, a
 `filename → timestamp → seconds` index used to line frames up with the SRT.
 
 ### extract_frames.py flags
@@ -136,8 +135,8 @@ Tuning: if slides are being dropped, lower `--threshold` (try `2`) or shorten
 
 ## Step 5 — Read everything
 
-1. Read `frames/frames.tsv` first to get the timeline.
-2. Read **every** frame image in `frames/` — none may be skipped. Work in
+1. Read `assets/<slug>/frames.tsv` first to get the timeline.
+2. Read **every** frame image in `assets/<slug>/` — none may be skipped. Work in
    timestamp order and in batches so the ordering stays intact. (Must use a GPT Vision model to read and anlayze the image)
 3. Read `video/<SLUG>.ai-zh.srt` in full.
 4. Cross-check both against `resources/` where it exists.
@@ -149,20 +148,18 @@ attach each transcript passage to the slide that was on screen.
 
 Write two files:
 
-**`notes/<SLUG>-teaching-note.md`** — a standalone explanation of the video:
-sections following the video's own structure, each concept explained in full
-prose, every code snippet reproduced verbatim (from `resources/` when
-available, otherwise transcribed from the frames), and a `[HH:MM:SS]`
-timestamp on each section heading so the source can be found again.
+**`notes/<SLUG>-teaching-note.md`**
 
-**`notes/<SLUG>-active-recall.md`**
+- Refer [Example Teaching Notes](./references/Example_Teaching_Note.md)
+- Use the assets/<slug>/\*.jpg as much as possible (but the repeat jpg, don't use too many to confuse user) in the newly created teaching-note.md
 
-- Refer [Example Active Recall Note](./Example_Active_Recall_Note.md)
+## Step 7 - Clean up all the unused image
+
+- Clean up all the unused image that are not used in the newly created `<SLUG>-teaching-note.md`
 
 ## Notes and caveats
 
 - The AI subtitles are auto-generated and get technical terms wrong; trust the
   frames and `resources/` over the transcript for identifiers and API names.
-- Re-running step 4 clears `frames/` unless `--keep-existing` is passed.
 - Cookies expire quickly. A sudden drop to low-quality formats or missing
   subtitles almost always means stale cookies, not a broken command.
