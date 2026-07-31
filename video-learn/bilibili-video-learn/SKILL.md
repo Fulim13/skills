@@ -148,10 +148,20 @@ Write one files: **`notes/<SLUG>-teaching-note.md`**
 
 - Follow [Example Teaching Notes](./references/Example_Teaching_Note.md) for the outline and note constructions, the content is just the example
 - Embed a frame (from `./assets/<slug>/*.jpg`) in the newly created teaching-note.md as much as possible — a slide, a code screen, a terminal result. For Duplicated frame, don't put it. Link them as `./assets/<slug>/<file>.jpg`, relative to the note itself.
+- Appendix：课程完整资源代码 Section must exists in the last section of the `notes/<SLUG>-teaching-note.md` for full source code
 
 ## Step 7 - Clean up all the unused image
 
 - Clean up all the unused image that are not used in the newly created `<SLUG>-teaching-note.md`
+
+## Step 8 - Create a pratice note
+
+Write one files: **`notes/<SLUG>-pratice-note.md`**
+
+- Follow [Practice Instruction Guideline](./references/Practice_Instruction_Guideline.md) for the instructions constructions
+- Refer [Example Instruction](./references/Example_Instruction.md) for the actual instructions will built. The content is for demo. The content of the practice note need to fill out based on the current context.
+
+##
 
 ## Notes and caveats
 
