@@ -1,13 +1,13 @@
 ---
 name: bilibili-video-learn
-description: 'Turn Bilibili Chinese video frames and subtitles into a full teaching english note and an active recall english note'
+description: 'Turn Bilibili video frames and subtitles into a full teaching note'
 disable-model-invocation: true
 ---
 
 # Bilibili Video Learn
 
 Download a Bilibili video with its AI subtitles, extract deduplicated frames,
-then read both to write a teaching note and an active recall note.
+then read both to write a teaching note.
 
 ## Workspace layout
 
@@ -18,11 +18,10 @@ Everything is produced inside the **current working directory**:
 ├── video/          # mp4 + srt (step 2)
 ├── frames/         # deduplicated frames + frames.tsv (step 4)
 ├── resources/      # OPTIONAL, user-supplied code snippets and slides
-└── notes/          # teaching note + active recall note (step 6)
+└── notes/          # teaching note (step 6)
 ```
 
-`SLUG` below means a short kebab-case name for the video, e.g.
-`168-zap-logger`. Pick it once in step 1 and reuse it everywhere.
+`SLUG` below means a short kebab-case name for the video, e.g. `168-zap-logger`. Pick it once in step 1 and reuse it everywhere.
 
 ## Step 1 — Preflight
 
@@ -149,15 +148,10 @@ attach each transcript passage to the slide that was on screen.
 
 Write two files:
 
-**`notes/<SLUG>-teaching-note.md`** — a standalone explanation of the video:
-sections following the video's own structure, each concept explained in full
-prose, every code snippet reproduced verbatim (from `resources/` when
-available, otherwise transcribed from the frames), and a `[HH:MM:SS]`
-timestamp on each section heading so the source can be found again.
+**`notes/<SLUG>-teaching-note.md`**
 
-**`notes/<SLUG>-active-recall.md`**
-
-- Refer [Example Active Recall Note](./Example_Active_Recall_Note.md)
+- Refer [Example Teaching Notes](./references/Example_Teaching_Note.md)
+- Use the frames/\*.jpg as much as possible (but the repeat frame, don't use too many to confuse user) in the newly created teaching-note.md
 
 ## Notes and caveats
 
