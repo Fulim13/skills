@@ -149,6 +149,7 @@ Write one files: **`notes/<SLUG>-teaching-note.md`**
 - Follow [Example Teaching Notes](./references/Example_Teaching_Note.md) for the outline and note constructions, the content is just the example
 - Embed a frame (from `./assets/<slug>/*.jpg`) in the newly created teaching-note.md as much as possible — a slide, a code screen, a terminal result. For Duplicated frame, don't put it. Link them as `./assets/<slug>/<file>.jpg`, relative to the note itself.
 - Appendix：课程完整资源代码 Section must exists in the last section of the `notes/<SLUG>-teaching-note.md` for full source code
+- NOTE (MUST): The teaching note must match the video's live-coding flow: start with this, test with that, then move to the next step
 
 ## Step 7 - Clean up all the unused image
 
